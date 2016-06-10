@@ -12,7 +12,8 @@
     "excludedFiles": [
       "test.html"
     ],
-    "buildRequired": true
+    "buildRequired": true,
+    "lastBuildDateTime": "Fri, 10 Jun 2016 05:38:14 GMT"
   },
   "dataBinding": {
     "/webapp/view/App.view.xml": {
@@ -63,5 +64,10 @@
     "notifyBeforePushLevel": "Error",
     "blockPush": false,
     "blockPushLevel": "Error"
+  },
+  "hcpdeploy": {
+    "account": "s0007545714trial",
+    "name": "opensapui5week3",
+    "lastVersionWeTriedToDeploy": "1.0.0"
   }
 }

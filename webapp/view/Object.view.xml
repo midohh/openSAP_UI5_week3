@@ -21,6 +21,9 @@
 							formatter: '.formatter.numberUnit'
 				}"
 				numberUnit="{CurrencyCode}">
+				<attributes>
+					<ObjectAttribute text="{SupplierName}"/>
+				</attributes>
 			</ObjectHeader>
  		</semantic:content>
 
