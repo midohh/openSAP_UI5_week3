@@ -1,6 +1,7 @@
 <mvc:View
 	controllerName="opensap.manageproducts.controller.Object"
 	xmlns="sap.m"
+	xmlns:core="sap.ui.core"
 	xmlns:mvc="sap.ui.core.mvc"
 	xmlns:semantic="sap.m.semantic">
 
@@ -16,15 +17,24 @@
 			<ObjectHeader
 				id="objectHeader"
 				title="{ProductID}"
+				responsive="true"  
 				number="{
 							path: 'Price',
 							formatter: '.formatter.numberUnit'
 				}"
-				numberUnit="{CurrencyCode}">
+				numberUnit="{CurrencyCode}"
+				titleActive="true"
+				titlePress="onShowDetailPopover">
 				<attributes>
 					<ObjectAttribute text="{SupplierName}"/>
 				</attributes>
 			</ObjectHeader>
+			
+			<!--Start MIDO INS -->
+			<mvc:XMLView viewName ="opensap.manageproducts.view.ProductDetails"/>
+			<core:Fragment fragmentName="opensap.manageproducts.view.SupplierInfo" type="XML"/>
+			<!--Ende MIDO INS -->
+			
  		</semantic:content>
 
 		<semantic:sendEmailAction>

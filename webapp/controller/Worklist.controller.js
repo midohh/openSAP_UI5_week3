@@ -11,6 +11,15 @@ sap.ui.define([
 		return BaseController.extend("opensap.manageproducts.controller.Worklist", {
 
 			formatter: formatter,
+			
+			/* MIDO: _n means private Variable 
+			/* MIDO: "String Filter"
+			*/
+			_nFilters: {
+				cheap : 	[new Filter("Price", "LT", 100)],
+				moderate :	[new Filter("Price", "BT", 100, 1000)],
+				expensive : [new Filter("Price", "GT", 1000)]
+			},
 
 			/* =========================================================== */
 			/* lifecycle methods                                           */
@@ -41,7 +50,10 @@ sap.ui.define([
 					shareSendEmailSubject: this.getResourceBundle().getText("shareSendEmailWorklistSubject"),
 					shareSendEmailMessage: this.getResourceBundle().getText("shareSendEmailWorklistMessage", [location.href]),
 					tableNoDataText : this.getResourceBundle().getText("tableNoDataText"),
-					tableBusyDelay : 0
+					tableBusyDelay : 0,
+					cheap : 0,  	//MIDO: INS for IconTabBar-Icon Count Filtered Items
+					moderate : 0,	//MIDO: INS for IconTabBar-Icon Count Filtered Items
+					expensive : 0	//MIDO: INS for IconTabBar-Icon Count Filtered Items
 				});
 				this.setModel(oViewModel, "worklistView");
 
@@ -71,11 +83,32 @@ sap.ui.define([
 				// update the worklist's object counter after the table update
 				var sTitle,
 					oTable = oEvent.getSource(),
-					iTotalItems = oEvent.getParameter("total");
+					iTotalItems = oEvent.getParameter("total"),
+					
+					//-->MIDO INS for IconTabBar-Icon Count Filtered Items
+					oModel = this.getModel(),
+					oViewModel = this.getModel("worklistView"); 
+					//<--MIDO INS for IconTabBar-Icon Count Filtered Items
+				
+					
 				// only update the counter if the length is final and
 				// the table is not empty
 				if (iTotalItems && oTable.getBinding("items").isLengthFinal()) {
 					sTitle = this.getResourceBundle().getText("worklistTableTitleCount", [iTotalItems]);
+					
+					//-->MIDO INS for IconTabBar-Icon Count Filtered Items
+					//iterate over all Filterentriess and execute the callback function
+					jQuery.each(this._nFilters, function(sKey, oFilter){
+						oModel.read("/ProductSet/$count",{
+							filters:oFilter,
+							success: function(oData){
+								var sPath = "/" + sKey;
+								oViewModel.setProperty(sPath, oData);
+							}
+						});
+					});
+					//<--MIDO INS for IconTabBar-Icon Count Filtered Items
+					
 				} else {
 					sTitle = this.getResourceBundle().getText("worklistTableTitle");
 				}
@@ -129,6 +162,32 @@ sap.ui.define([
 			 */
 			onRefresh : function () {
 				this._oTable.getBinding("items").refresh();
+			},
+			
+			/*MIDO Event Handler Filter*/
+			onQuickFilter : function(oEvent){
+				var sKey = oEvent.getParameter("key"),
+					oFilter = this._nFilters[sKey],
+					oBinding = this._oTable.getBinding("items");
+					oBinding.filter(oFilter);
+			},
+			
+			/* Event Handler for popover */
+			onShowDetailPopover : function(oEvent){
+				var oPopover = this._getPopover(); //this.byId("dimensionsPopover");
+				oPopover.bindElement(oEvent.getSource().getBindingContext().getPath());
+				
+				var oOpener = oEvent.getParameter("domRef");
+				oPopover.openBy(oOpener);
+			},
+			
+			/* MIDO: create popover from fragment and add to view on runtime*/
+			_getPopover : function(){
+				if(!this._oPopover){
+					this._oPopover = sap.ui.xmlfragment("opensap.manageproducts.view.DetailPopover", this);
+					this.getView().addDependent(this._oPopover);
+				}
+				return this._oPopover;
 			},
 
 			/* =========================================================== */
